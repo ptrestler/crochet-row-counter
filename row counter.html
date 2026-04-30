@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Ivy Top" />
+  <title>Ivy Top Row Counter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      min-height: 100vh;
+      background: #f5f0eb;
+      font-family: Georgia, serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+    #app { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
+
+    .title-area { text-align: center; margin-bottom: 20px; }
+    .title-sub { font-size: 11px; letter-spacing: 3px; color: #a89880; text-transform: uppercase; margin-bottom: 4px; }
+    h1 { font-size: 28px; color: #3d3028; font-weight: normal; letter-spacing: 1px; }
+    .title-detail { font-size: 12px; color: #9a8878; margin-top: 2px; }
+
+    .tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+    .tab {
+      padding: 6px 16px; border-radius: 20px; border: none; cursor: pointer;
+      font-size: 13px; font-family: Georgia, serif;
+      background: #e8e0d8; color: #6b5d52;
+      transition: all 0.2s;
+    }
+    .tab.active { color: #fff; font-weight: bold; }
+    .tab .tab-count { margin-left: 6px; font-size: 10px; opacity: 0.7; }
+
+    .card {
+      background: #fff; border-radius: 20px; padding: 28px 24px;
+      width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.08); text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .ring-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 16px; }
+    .ring-num { font-size: 44px; font-weight: bold; color: #3d3028; line-height: 1; }
+    .ring-label { font-size: 12px; color: #a89880; }
+    .ring-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+
+    .badge {
+      border-radius: 8px; padding: 6px 12px; margin-bottom: 12px;
+      font-size: 12px;
+    }
+    .badge.plain { background: #faf6f1; color: #8a7a6a; }
+    .badge.special { background: #fff5e6; color: #c07a2a; font-weight: bold; }
+
+    .note-box {
+      border-radius: 10px; padding: 10px 14px; margin-bottom: 12px;
+      font-size: 12px; color: #3d3028; text-align: left; line-height: 1.6;
+      animation: fadeIn 0.3s ease;
+    }
+    .next-box {
+      background: #f5f0ea; border-radius: 10px; padding: 8px 14px; margin-bottom: 12px;
+      font-size: 11px; color: #a89880; text-align: left; line-height: 1.5;
+    }
+    .next-box strong { color: #8a7a6a; }
+
+    .btns { display: flex; gap: 12px; justify-content: center; }
+    .btn-minus, .btn-reset {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 2px solid #e0d8d0; background: #fff;
+      cursor: pointer; color: #6b5d52; font-size: 24px;
+      font-family: Georgia, serif;
+      transition: transform 0.15s;
+    }
+    .btn-minus:disabled { color: #ccc; cursor: not-allowed; }
+    .btn-reset { font-size: 18px; color: #a89880; }
+    .btn-plus {
+      width: 72px; height: 72px; border-radius: 50%;
+      border: none; cursor: pointer; color: #fff; font-size: 30px;
+      transition: transform 0.15s;
+    }
+    .btn-minus:active, .btn-reset:active, .btn-plus:active { transform: scale(0.93); }
+
+    .overview {
+      background: #fff; border-radius: 16px; padding: 16px 20px;
+      width: 100%; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .overview-title {
+      font-size: 11px; letter-spacing: 2px; color: #a89880;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .ov-row { cursor: pointer; margin-bottom: 10px; }
+    .ov-label { display: flex; justify-content: space-between; font-size: 12px; color: #6b5d52; margin-bottom: 4px; }
+    .ov-track { background: #f0ebe4; border-radius: 4px; height: 6px; overflow: hidden; }
+    .ov-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease; }
+    .btn-reset-all {
+      margin-top: 10px; width: 100%; padding: 8px;
+      border: 1px solid #e0d8d0; border-radius: 8px;
+      background: #faf6f1; font-size: 12px; color: #a89880;
+      cursor: pointer; font-family: Georgia, serif;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const FRONT_NOTES = [
+  { row: 1,  text: "Strap 1 Row 1 — Ch 30, foundation row. 9 ws." },
+  { row: 11, text: "End of Strap 1 (11 rows). Ch 39 for neckline, cut yarn with 1–2\" tail. Make Strap 2 the same — don't cut that yarn." },
+  { row: 12, text: "First full-width row after connecting both straps. 31 ws total." },
+  { row: 19, text: "End of 7 non-increase rows after connecting. Next row is an increase." },
+  { row: 20, text: "INCREASE ROW — mark 5th ch1 sp from both ends. 2 increases. 33 ws after." },
+  { row: 39, text: "End of 20 non-increase rows. Next: armhole + bust increases." },
+  { row: 40, text: "INCREASE ROW — armhole (both ends) + bust (marked ch1 sps). 37 ws after." },
+  { row: 41, text: "Non-increase row." },
+  { row: 42, text: "INCREASE ROW — armhole + bust again. LAST armhole increase. Place stitch markers at both ends of this row! 41 ws after." },
+  { row: 43, text: "Non-increase row." },
+  { row: 44, text: "Non-increase row." },
+  { row: 45, text: "Non-increase row (total 45 rows so far)." },
+  { row: 46, text: "Non-increase row." },
+  { row: 47, text: "INCREASE ROW — mark 8th & 14th ch1 sp from both ends. 45 ws after." },
+  { row: 48, text: "Non-increase row." },
+  { row: 49, text: "INCREASE ROW — mark 10th ch1 sp from both ends. 47 ws after. Continue non-increase rows to your widest bust point, then begin decreases." },
+];
+
+const BACK_NOTES = [
+  { row: 1,  text: "Row 1 — Ch 30, foundation row. 9 ws. (Same chain as front strap.)" },
+  { row: 4,  text: "End of non-increase rows (total 4 rows). Next: first increase." },
+  { row: 5,  text: "INCREASE ROW — mark 4th ch1 sp from right/hook side. 10 ws after." },
+  { row: 32, text: "End of non-increase rows (total 32). Next: armhole increase." },
+  { row: 33, text: "ARMHOLE INCREASE — make a ws on same st as first sc (right-side armhole). 11 ws after." },
+  { row: 34, text: "Non-increase row." },
+  { row: 35, text: "Non-increase row." },
+  { row: 36, text: "INCREASE ROW. 12 ws after." },
+  { row: 37, text: "Non-increase row." },
+  { row: 38, text: "Non-increase row." },
+  { row: 39, text: "INCREASE ROW. 13 ws after." },
+  { row: 40, text: "Non-increase row." },
+  { row: 41, text: "INCREASE ROW. 14 ws after." },
+  { row: 42, text: "Non-increase row." },
+  { row: 43, text: "Non-increase row." },
+  { row: 44, text: "INCREASE ROW — place stitch marker on this row! 15 ws after." },
+  { row: 49, text: "End of 5 non-increase rows after last increase (total 49 rows)." },
+  { row: 50, text: "BEGIN V-OPENING — first 5 ch1 sps: use sc–ch1–sc instead of full ws." },
+  { row: 51, text: "V-opening row — last 5 ch1 sps: use sc–ch1–sc instead of full ws." },
+  { row: 52, text: "V-opening row (repeat rows 50–51 pattern)." },
+  { row: 53, text: "V-opening row." },
+  { row: 54, text: "V-opening row." },
+  { row: 55, text: "V-opening row." },
+  { row: 56, text: "V-opening row." },
+  { row: 57, text: "Last V-opening row (total 57). Continue non-increase rows. Begin tie when 11 rows remain before total matches front panel." },
+];
+
+const SECTIONS = [
+  { id: "front",      label: "Front Panel",    color: "#7c9e87", notes: FRONT_NOTES },
+  { id: "back_left",  label: "Back Panel (L)", color: "#8a7ea8", notes: BACK_NOTES },
+  { id: "back_right", label: "Back Panel (R)", color: "#7ea8a0", notes: BACK_NOTES },
+];
+
+let state = {
+  sectionIdx: 0,
+  rows: [0, 0, 0],
+  flashNote: null,
+  flashTimer: null,
+};
+
+function isSpecialNote(text) {
+  return text && (text.includes("INCREASE") || text.includes("ARMHOLE") || text.includes("V-OPENING") || text.includes("marker"));
+}
+
+function arcPath(pct) {
+  const r = 54, cx = 70, cy = 70;
+  const start = -Math.PI / 2;
+  const p = Math.min(pct, 0.9999);
+  const angle = start + p * 2 * Math.PI;
+  const x1 = cx + r * Math.cos(start), y1 = cy + r * Math.sin(start);
+  const x2 = cx + r * Math.cos(angle), y2 = cy + r * Math.sin(angle);
+  if (pct >= 1) return `M ${cx} ${cy - r} A ${r} ${r} 0 1 1 ${cx - 0.001} ${cy - r} Z`;
+  return `M ${x1} ${y1} A ${r} ${r} 0 ${pct > 0.5 ? 1 : 0} 1 ${x2} ${y2}`;
+}
+
+function render() {
+  const { sectionIdx, rows, flashNote } = state;
+  const section = SECTIONS[sectionIdx];
+  const currentRow = rows[sectionIdx];
+  const currentNote = section.notes.find(n => n.row === currentRow);
+  const nextNote = section.notes.find(n => n.row > currentRow);
+  const special = isSpecialNote(currentNote?.text);
+  const ringColor = special ? "#c07a2a" : section.color;
+  const pct = currentRow / 60;
+
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="title-area">
+      <div class="title-sub">Sunshines &amp; Crafts</div>
+      <h1>Ivy Top</h1>
+      <div class="title-detail">Row Counter · Baby Bunny / Size M</div>
+    </div>
+
+    <div class="tabs">
+      ${SECTIONS.map((s, i) => `
+        <button class="tab ${i === sectionIdx ? 'active' : ''}"
+          style="${i === sectionIdx ? `background:${s.color};box-shadow:0 2px 8px ${s.color}66;` : ''}"
+          onclick="selectSection(${i})">
+          ${s.label}
+          ${rows[i] > 0 && i !== sectionIdx ? `<span class="tab-count">row ${rows[i]}</span>` : ''}
+        </button>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <div class="ring-wrap">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="54" fill="none" stroke="#f0ebe4" stroke-width="8"/>
+          ${currentRow > 0 ? `<path d="${arcPath(pct)}" fill="none" stroke="${ringColor}" stroke-width="8" stroke-linecap="round"/>` : ''}
+        </svg>
+        <div class="ring-center">
+          <div class="ring-num">${currentRow}</div>
+          <div class="ring-label">row</div>
+        </div>
+      </div>
+
+      ${currentRow > 0 ? `
+        <div class="badge ${special ? 'special' : 'plain'}">
+          ${special ? '⬆ Special / Increase Row' : 'Plain row — repeat Step 11 / Step 3'}
+        </div>
+      ` : ''}
+
+      ${flashNote ? `
+        <div class="note-box" style="background:${section.color}18;border:1px solid ${section.color}55;">
+          📌 ${flashNote}
+        </div>
+      ` : nextNote ? `
+        <div class="next-box">
+          <strong>Next: Row ${nextNote.row}</strong><br/>${nextNote.text}
+        </div>
+      ` : ''}
+
+      <div class="btns">
+        <button class="btn-minus" onclick="decrement()" ${currentRow === 0 ? 'disabled' : ''}>−</button>
+        <button class="btn-plus" style="background:${section.color};box-shadow:0 4px 16px ${section.color}55;" onclick="increment()">+</button>
+        <button class="btn-reset" onclick="resetSection()" title="Reset this section">↺</button>
+      </div>
+    </div>
+
+    <div class="overview">
+      <div class="overview-title">Progress Overview</div>
+      ${SECTIONS.map((s, i) => `
+        <div class="ov-row" onclick="selectSection(${i})">
+          <div class="ov-label">
+            <span style="${i === sectionIdx ? 'font-weight:bold;' : ''}">${s.label}</span>
+            <span style="color:#a89880;">row ${rows[i]}</span>
+          </div>
+          <div class="ov-track">
+            <div class="ov-fill" style="width:${Math.min(rows[i]/60,1)*100}%;background:${s.color};"></div>
+          </div>
+        </div>
+      `).join('')}
+      <button class="btn-reset-all" onclick="resetAll()">Reset All</button>
+    </div>
+  `;
+}
+
+function setFlash(text) {
+  if (state.flashTimer) clearTimeout(state.flashTimer);
+  state.flashNote = text;
+  render();
+  if (text) {
+    state.flashTimer = setTimeout(() => {
+      state.flashNote = null;
+      render();
+    }, 6000);
+  }
+}
+
+function selectSection(i) {
+  state.sectionIdx = i;
+  state.flashNote = null;
+  const section = SECTIONS[i];
+  const currentNote = section.notes.find(n => n.row === state.rows[i]);
+  if (currentNote) setFlash(currentNote.text);
+  else render();
+}
+
+function increment() {
+  state.rows[state.sectionIdx]++;
+  const section = SECTIONS[state.sectionIdx];
+  const currentNote = section.notes.find(n => n.row === state.rows[state.sectionIdx]);
+  if (currentNote) setFlash(currentNote.text);
+  else { state.flashNote = null; render(); }
+}
+
+function decrement() {
+  if (state.rows[state.sectionIdx] > 0) {
+    state.rows[state.sectionIdx]--;
+    const section = SECTIONS[state.sectionIdx];
+    const currentNote = section.notes.find(n => n.row === state.rows[state.sectionIdx]);
+    if (currentNote) setFlash(currentNote.text);
+    else { state.flashNote = null; render(); }
+  }
+}
+
+function resetSection() {
+  state.rows[state.sectionIdx] = 0;
+  state.flashNote = null;
+  render();
+}
+
+function resetAll() {
+  state.rows = [0, 0, 0];
+  state.sectionIdx = 0;
+  state.flashNote = null;
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
