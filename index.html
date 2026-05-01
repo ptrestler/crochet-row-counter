@@ -115,21 +115,21 @@
 <script>
 const FRONT_NOTES = [
   { row: 1,  text: "Strap 1 Row 1 — Ch 30, foundation row. 9 ws." },
-  { row: 11, text: "End of Strap 1 (11 rows). Ch 31 for neckline, cut yarn with 1–2\" tail. Make Strap 2 the same — don't cut that yarn." },
-  { row: 12, text: "First full-width row after connecting both straps. 29 ws total." },
+  { row: 11, text: "End of Strap 1 (11 rows). Ch 39 for neckline, cut yarn with 1–2\" tail. Make Strap 2 the same — don't cut that yarn." },
+  { row: 12, text: "First full-width row after connecting both straps. 31 ws total." },
   { row: 19, text: "End of 7 non-increase rows after connecting. Next row is an increase." },
-  { row: 20, text: "INCREASE ROW — mark 5th ch1 sp from both ends. 2 increases. 31 ws after." },
+  { row: 20, text: "INCREASE ROW — mark 5th ch1 sp from both ends. 2 increases. 33 ws after." },
   { row: 39, text: "End of 20 non-increase rows. Next: armhole + bust increases." },
-  { row: 40, text: "INCREASE ROW — armhole (both ends) + bust (marked ch1 sps). 35 ws after." },
+  { row: 40, text: "INCREASE ROW — armhole (both ends) + bust (marked ch1 sps). 37 ws after." },
   { row: 41, text: "Non-increase row." },
-  { row: 42, text: "INCREASE ROW — armhole + bust again. LAST armhole increase. Place stitch markers at both ends of this row! 39 ws after." },
+  { row: 42, text: "INCREASE ROW — armhole + bust again. LAST armhole increase. Place stitch markers at both ends of this row! 41 ws after." },
   { row: 43, text: "Non-increase row." },
   { row: 44, text: "Non-increase row." },
   { row: 45, text: "Non-increase row (total 45 rows so far)." },
   { row: 46, text: "Non-increase row." },
-  { row: 47, text: "INCREASE ROW — mark 8th & 14th ch1 sp from both ends. 43 ws after." },
+  { row: 47, text: "INCREASE ROW — mark 8th & 14th ch1 sp from both ends. 45 ws after." },
   { row: 48, text: "Non-increase row." },
-  { row: 49, text: "INCREASE ROW — mark 10th ch1 sp from both ends. 45 ws after. Continue non-increase rows to your widest bust point, then begin decreases." },
+  { row: 49, text: "INCREASE ROW — mark 10th ch1 sp from both ends. 47 ws after. Continue non-increase rows to your widest bust point, then begin decreases." },
 ];
 
 const BACK_NOTES = [
@@ -166,12 +166,22 @@ const SECTIONS = [
   { id: "back_right", label: "Back Panel (R)", color: "#7ea8a0", notes: BACK_NOTES },
 ];
 
-let state = {
-  sectionIdx: 0,
-  rows: [0, 0, 0],
-  flashNote: null,
-  flashTimer: null,
-};
+function loadState() {
+  try {
+    const saved = localStorage.getItem('ivy-row-counter');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { sectionIdx: parsed.sectionIdx || 0, rows: parsed.rows || [0,0,0], flashNote: null, flashTimer: null };
+    }
+  } catch(e) {}
+  return { sectionIdx: 0, rows: [0,0,0], flashNote: null, flashTimer: null };
+}
+
+function saveState() {
+  try { localStorage.setItem('ivy-row-counter', JSON.stringify({ sectionIdx: state.sectionIdx, rows: state.rows })); } catch(e) {}
+}
+
+let state = loadState();
 
 function isSpecialNote(text) {
   return text && (text.includes("INCREASE") || text.includes("ARMHOLE") || text.includes("V-OPENING") || text.includes("marker"));
@@ -285,6 +295,7 @@ function setFlash(text) {
 function selectSection(i) {
   state.sectionIdx = i;
   state.flashNote = null;
+  saveState();
   const section = SECTIONS[i];
   const currentNote = section.notes.find(n => n.row === state.rows[i]);
   if (currentNote) setFlash(currentNote.text);
@@ -293,6 +304,7 @@ function selectSection(i) {
 
 function increment() {
   state.rows[state.sectionIdx]++;
+  saveState();
   const section = SECTIONS[state.sectionIdx];
   const currentNote = section.notes.find(n => n.row === state.rows[state.sectionIdx]);
   if (currentNote) setFlash(currentNote.text);
@@ -302,6 +314,7 @@ function increment() {
 function decrement() {
   if (state.rows[state.sectionIdx] > 0) {
     state.rows[state.sectionIdx]--;
+    saveState();
     const section = SECTIONS[state.sectionIdx];
     const currentNote = section.notes.find(n => n.row === state.rows[state.sectionIdx]);
     if (currentNote) setFlash(currentNote.text);
@@ -312,6 +325,7 @@ function decrement() {
 function resetSection() {
   state.rows[state.sectionIdx] = 0;
   state.flashNote = null;
+  saveState();
   render();
 }
 
@@ -319,6 +333,7 @@ function resetAll() {
   state.rows = [0, 0, 0];
   state.sectionIdx = 0;
   state.flashNote = null;
+  saveState();
   render();
 }
 
