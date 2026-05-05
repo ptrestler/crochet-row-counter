@@ -132,7 +132,17 @@ const FRONT_NOTES = [
   { row: 49, text: "INCREASE ROW — mark 10th ch1 sp from both ends. 49 ws after. Continue non-increase rows to your widest bust point, then begin decreases." },
   { row: 50, text: "Extra non-increase row (1 of 3)." },
   { row: 51, text: "Extra non-increase row (2 of 3)." },
-  { row: 52, text: "Extra non-increase row (3 of 3) — begin decreases next row when ready. LEFTY REMINDERS: Step 19 mark 10th from LEFT end (hook side) and 11th from RIGHT end. Step 23 mark 8th & 14th from LEFT end (hook side) and 9th & 15th from RIGHT end." },
+  { row: 52, text: "Extra non-increase row (3 of 3). Begin decreases next row. LEFTY: Step 19 mark 10th from LEFT end (hook side) and 11th from RIGHT end. Step 23 mark 8th & 14th from LEFT end, 9th & 15th from RIGHT end." },
+  { row: 53, text: "DECREASE ROW (Step 19) — mark 10th ch1 sp from LEFT end (hook side), 11th from RIGHT end. Remove 1 ws each side. 47 ws after." },
+  { row: 54, text: "Non-decrease row." },
+  { row: 55, text: "DECREASE ROW (Step 21) — decrease at same marked positions. 45 ws after." },
+  { row: 56, text: "Non-decrease row." },
+  { row: 57, text: "DECREASE ROW (Step 23) — mark 8th & 14th from LEFT end (hook side), 9th & 15th from RIGHT end. Remove 2 ws each side. 41 ws after." },
+  { row: 58, text: "Non-decrease row." },
+  { row: 59, text: "DECREASE ROW (Step 25) — repeat Step 23 positions. 37 ws after." },
+  { row: 60, text: "Non-decrease row." },
+  { row: 61, text: "DECREASE ROW (Step 27) — repeat Step 19 (2 spaces only). 35 ws after." },
+  { row: 62, text: "Front panel complete. Fasten off and weave in ends." },
 ];
 
 const BACK_NOTES = [
@@ -152,15 +162,20 @@ const BACK_NOTES = [
   { row: 42, text: "Non-increase row." },
   { row: 43, text: "Non-increase row." },
   { row: 44, text: "INCREASE ROW — place stitch marker on this row! 15 ws after." },
-  { row: 49, text: "End of 5 non-increase rows after last increase (total 49 rows)." },
-  { row: 50, text: "BEGIN V-OPENING — first 5 ch1 sps: use sc–ch1–sc instead of full ws." },
-  { row: 51, text: "V-opening row — last 5 ch1 sps: use sc–ch1–sc instead of full ws." },
-  { row: 52, text: "V-opening row (repeat rows 50–51 pattern)." },
-  { row: 53, text: "V-opening row." },
-  { row: 54, text: "V-opening row." },
-  { row: 55, text: "V-opening row." },
-  { row: 56, text: "V-opening row." },
-  { row: 57, text: "Last V-opening row (total 57). Continue non-increase rows. Begin tie when 11 rows remain before total matches front panel." },
+  { row: 49, text: "End of 5 non-increase rows after last increase (total 49 rows). Next: V-opening begins." },
+  { row: 50, text: "BEGIN V-OPENING — LEFTY: work sc–ch1–sc (instead of full ws) on first 5 ch1 sps you encounter (RIGHT side of fabric as worn)." },
+  { row: 51, text: "V-opening row — LEFTY: work sc–ch1–sc on last 5 ch1 sps you encounter (LEFT side of fabric as worn)." },
+  { row: 52, text: "V-opening row — repeat Row 50 (RIGHT-side 5 sps)." },
+  { row: 53, text: "V-opening row — repeat Row 51 (LEFT-side 5 sps)." },
+  { row: 54, text: "V-opening row — repeat Row 50 (RIGHT-side 5 sps)." },
+  { row: 55, text: "V-opening row — repeat Row 51 (LEFT-side 5 sps)." },
+  { row: 56, text: "V-opening row — repeat Row 50 (RIGHT-side 5 sps)." },
+  { row: 57, text: "Last V-opening row — repeat Row 51 (LEFT-side 5 sps). V-opening complete. Now work non-increase rows until back panel matches front panel length (~62 rows total)." },
+  { row: 58, text: "Non-increase row." },
+  { row: 59, text: "Non-increase row." },
+  { row: 60, text: "Non-increase row." },
+  { row: 61, text: "Non-increase row." },
+  { row: 62, text: "Back panel complete (matches front panel length). Fasten off. Begin tie if not already started." },
 ];
 
 const SECTIONS = [
@@ -187,7 +202,10 @@ function saveState() {
 let state = loadState();
 
 function isSpecialNote(text) {
-  return text && (text.includes("INCREASE") || text.includes("ARMHOLE") || text.includes("V-OPENING") || text.includes("marker"));
+  return text && (text.includes("INCREASE") || text.includes("DECREASE") || text.includes("ARMHOLE") || text.includes("V-OPENING") || text.includes("marker"));
+}
+function isDecreaseNote(text) {
+  return text && text.includes("DECREASE");
 }
 
 function arcPath(pct) {
@@ -208,8 +226,10 @@ function render() {
   const currentNote = section.notes.find(n => n.row === currentRow);
   const nextNote = section.notes.find(n => n.row > currentRow);
   const special = isSpecialNote(currentNote?.text);
-  const ringColor = special ? "#c07a2a" : section.color;
-  const pct = currentRow / 60;
+  const decrease = isDecreaseNote(currentNote?.text);
+  const ringColor = decrease ? "#a05080" : (special ? "#c07a2a" : section.color);
+  const maxRows = sectionIdx === 0 ? 62 : 62;
+  const pct = currentRow / maxRows;
 
   const app = document.getElementById('app');
   app.innerHTML = `
@@ -243,8 +263,8 @@ function render() {
       </div>
 
       ${currentRow > 0 ? `
-        <div class="badge ${special ? 'special' : 'plain'}">
-          ${special ? '⬆ Special / Increase Row' : 'Plain row — repeat Step 11 / Step 3'}
+        <div class="badge ${special ? 'special' : 'plain'}" style="${decrease ? 'background:#f5e6ef;color:#a05080;' : ''}">
+          ${decrease ? '↓ Special / Decrease Row' : special ? '⬆ Special / Increase Row' : 'Plain row — repeat Step 11 / Step 3'}
         </div>
       ` : ''}
 
