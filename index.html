@@ -142,7 +142,18 @@ const FRONT_NOTES = [
   { row: 59, text: "DECREASE ROW (Step 25) — repeat Step 23 positions. 37 ws after." },
   { row: 60, text: "Non-decrease row." },
   { row: 61, text: "DECREASE ROW (Step 27) — repeat Step 19 (2 spaces only). 35 ws after." },
-  { row: 62, text: "Front panel complete. Fasten off and weave in ends." },
+  { row: 62, text: "Non-decrease row (Step 28, row 1 of ~12)." },
+  { row: 63, text: "Non-decrease row (Step 28, row 2 of ~12)." },
+  { row: 64, text: "Non-decrease row (Step 28, row 3 of ~12)." },
+  { row: 65, text: "Non-decrease row (Step 28, row 4 of ~12)." },
+  { row: 66, text: "Non-decrease row (Step 28, row 5 of ~12)." },
+  { row: 67, text: "Non-decrease row (Step 28, row 6 of ~12)." },
+  { row: 68, text: "Non-decrease row (Step 28, row 7 of ~12)." },
+  { row: 69, text: "Non-decrease row (Step 28, row 8 of ~12)." },
+  { row: 70, text: "Non-decrease row (Step 28, row 9 of ~12)." },
+  { row: 71, text: "Non-decrease row (Step 28, row 10 of ~12)." },
+  { row: 72, text: "Non-decrease row (Step 28, row 11 of ~12). Almost done!" },
+  { row: 73, text: "Front panel complete — row 73. Fasten off and weave in ends." },
 ];
 
 const BACK_NOTES = [
@@ -170,12 +181,23 @@ const BACK_NOTES = [
   { row: 54, text: "V-opening row — repeat Row 50 (RIGHT-side 5 sps)." },
   { row: 55, text: "V-opening row — repeat Row 51 (LEFT-side 5 sps)." },
   { row: 56, text: "V-opening row — repeat Row 50 (RIGHT-side 5 sps)." },
-  { row: 57, text: "Last V-opening row — repeat Row 51 (LEFT-side 5 sps). V-opening complete. Now work non-increase rows until back panel matches front panel length (~62 rows total)." },
+  { row: 57, text: "Last V-opening row — repeat Row 51 (LEFT-side 5 sps). V-opening complete. Now work non-increase rows until back panel matches front panel length (~73 rows total)." },
   { row: 58, text: "Non-increase row." },
   { row: 59, text: "Non-increase row." },
   { row: 60, text: "Non-increase row." },
   { row: 61, text: "Non-increase row." },
-  { row: 62, text: "Back panel complete (matches front panel length). Fasten off. Begin tie if not already started." },
+  { row: 62, text: "Non-increase row (begin tie if not already started — 11 rows remain)." },
+  { row: 63, text: "Non-increase row." },
+  { row: 64, text: "Non-increase row." },
+  { row: 65, text: "Non-increase row." },
+  { row: 66, text: "Non-increase row." },
+  { row: 67, text: "Non-increase row." },
+  { row: 68, text: "Non-increase row." },
+  { row: 69, text: "Non-increase row." },
+  { row: 70, text: "Non-increase row." },
+  { row: 71, text: "Non-increase row." },
+  { row: 72, text: "Non-increase row. Almost done!" },
+  { row: 73, text: "Back panel complete — row 73. Fasten off." },
 ];
 
 const SECTIONS = [
@@ -228,7 +250,7 @@ function render() {
   const special = isSpecialNote(currentNote?.text);
   const decrease = isDecreaseNote(currentNote?.text);
   const ringColor = decrease ? "#a05080" : (special ? "#c07a2a" : section.color);
-  const maxRows = sectionIdx === 0 ? 62 : 62;
+  const maxRows = 73;
   const pct = currentRow / maxRows;
 
   const app = document.getElementById('app');
