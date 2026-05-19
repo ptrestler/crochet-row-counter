@@ -244,7 +244,6 @@ function render() {
   const section = SECTIONS[sectionIdx];
   const currentRow = rows[sectionIdx];
   const currentNote = section.notes.find(n => n.row === currentRow);
-  const nextNote = section.notes.find(n => n.row > currentRow);
   const special = isSpecialNote(currentNote?.text);
   const decrease = isDecreaseNote(currentNote?.text);
   const ringColor = decrease ? "#a05080" : (special ? "#c07a2a" : section.color);
@@ -291,10 +290,6 @@ function render() {
       ${currentNote ? `
         <div class="note-box" style="background:${section.color}18;border:1px solid ${section.color}55;">
           📌 ${currentNote.text}
-        </div>
-      ` : nextNote ? `
-        <div class="next-box">
-          <strong>Next: Row ${nextNote.row}</strong><br/>${nextNote.text}
         </div>
       ` : ''}
 
